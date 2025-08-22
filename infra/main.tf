@@ -4,7 +4,7 @@ data "aws_vpc" "default" {
 
 data "aws_subnets" "available-subnets" {
   filter {
-    name = "vpc-id"
+    name   = "vpc-id"
     values = [data.aws_vpc.default.id]
   }
 
@@ -14,8 +14,8 @@ data "aws_subnets" "available-subnets" {
   }
 }
 
-resource "aws_eks_cluster" "ankit-cluster" {
-  name     = "ankit-cluster"
+resource "aws_eks_cluster" "Tech-data-cluster" {
+  name     = "Tech-data-cluster"
   role_arn = aws_iam_role.example.arn
 
   vpc_config {
@@ -31,22 +31,22 @@ resource "aws_eks_cluster" "ankit-cluster" {
 }
 
 output "endpoint" {
-  value = aws_eks_cluster.ankit-cluster.endpoint
+  value = aws_eks_cluster.Tech-data-cluster.endpoint
 }
 
 output "kubeconfig-certificate-authority-data" {
-  value = aws_eks_cluster.ankit-cluster.certificate_authority[0].data
+  value = aws_eks_cluster.Tech-data-cluster.certificate_authority[0].data
 }
 
 resource "aws_eks_node_group" "node-grp" {
-  cluster_name    = aws_eks_cluster.ankit-cluster.name
+  cluster_name    = aws_eks_cluster.Tech-data-cluster.name
   node_group_name = "pc-node-group"
   node_role_arn   = aws_iam_role.worker.arn
   subnet_ids      = data.aws_subnets.available-subnets.ids
   capacity_type   = "ON_DEMAND"
   disk_size       = "20"
   instance_types  = ["t2.micro"]
-  labels = tomap({ env = "dev" })
+  labels          = tomap({ env = "dev" })
 
   scaling_config {
     desired_size = 2
@@ -61,5 +61,5 @@ resource "aws_eks_node_group" "node-grp" {
     aws_iam_role_policy_attachment.AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.AmazonEKS_CNI_Policy,
     aws_iam_role_policy_attachment.AmazonEC2ContainerRegistryReadOnly
-    ]  
+  ]
 }
